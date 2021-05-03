@@ -1,0 +1,11 @@
+<resources>
+
+    <style name="Theme.K6nele.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.K6nele.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.K6nele.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>
