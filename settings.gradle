@@ -1,1 +1,2 @@
 include ':app', ':speechutils:app'
+rootProject.name='eestikeelse-haalassistendi-raamistik'
