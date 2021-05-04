@@ -26,14 +26,14 @@ Rakendus pole saadaval APKna või Play Poes rakendusena. Seega tuleb lähtekoodi
 
 Rakenduse proovimiseks on vaja täita järgmised sammud:
 
-1. Paigaldada Android Studio. See on allalaetav [siit](https://developer.android.com/studio?gclid=Cj0KCQjwvr6EBhDOARIsAPpqUPF2ceedQLxOMrbKwvUWqbVNfcudXaGmYyGwC1v46Ens_vixnfYo5vIaAriOEALw_wcB&gclsrc=aw.ds)
+Paigaldada Android Studio. See on allalaetav [siit](https://developer.android.com/studio?gclid=Cj0KCQjwvr6EBhDOARIsAPpqUPF2ceedQLxOMrbKwvUWqbVNfcudXaGmYyGwC1v46Ens_vixnfYo5vIaAriOEALw_wcB&gclsrc=aw.ds)
 
-1. Lae alla see repositoorium ja alammoodul `speechutils` kasutades käsku 
+Lae alla see repositoorium ja alammoodul `speechutils` kasutades käsku 
 ```
 git clone --recursive git@github.com:leppsalujyrgen/eestikeelse-haalassistendi-raamistik.git
 ```
 
-1. Ava projekt `eestikeelse-haalassistendi-raamistik` Android Studio IDEs ja jooksuta Gradle käsku
+Ava projekt `eestikeelse-haalassistendi-raamistik` Android Studio IDEs ja jooksuta Gradle käsku
 ```
 gradle assemble
 ```
