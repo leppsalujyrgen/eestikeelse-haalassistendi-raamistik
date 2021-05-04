@@ -30,6 +30,13 @@
         android:name="android.hardware.touchscreen"
         android:required="false" />
 
+    <!--
+        Description: Set app\src\main\java\ee\ut\phon\android\vova\MainActivity.java
+        as application LAUNCHER and DEFAULT category.
+
+        Author: Jürgen Leppsalu
+        Date: 04.05.2021
+     -->
     <application
         android:allowBackup="true"
         android:description="@string/descriptionApp"

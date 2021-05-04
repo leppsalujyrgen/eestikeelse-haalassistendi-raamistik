@@ -1,5 +1,17 @@
 package ee.ut.phon.android.vova;
 
+/**
+ *
+ * File: Feedback.java
+ *
+ * Description: Object used to give feedback to user.
+ * Each object contains short description and long description of the feedback.
+ *
+ * Author: Jürgen Leppsalu
+ * Date: 04.05.2021
+ *
+ */
+
 public class Feedback {
 
     boolean canAudibleFeedbackBeGiven;

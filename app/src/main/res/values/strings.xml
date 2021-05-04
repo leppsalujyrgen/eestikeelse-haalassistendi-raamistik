@@ -77,9 +77,8 @@
     <string name="hello_first_fragment" translatable="false">Hello first fragment</string>
     <string name="hello_second_fragment" translatable="false">Hello second fragment. Arg: %1$s</string>
 
-    <!-- VOVA strings -->
+    <!-- Start of modifications to original K6nele-service application. Voice assistant strings/URLs. Jürgen Leppsalu. 04.05.2021. -->
     <string name="voice_synthesizer_api_url" translatable="false">https://teenus.eki.ee/konesyntees</string>
-    <!--<string name="speech_analyzer_api_url" translatable="false">https://demo0802049.mockable.io/speech</string>-->
     <string name="speech_analyzer_api_url" translatable="false">http://prog.keeleressursid.ee/veebid/haalassistentvova</string>
-
+    <!-- End of modifications to original Kõnele service application -->
 </resources>

@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Filename: network_security_config.xml
+
+    Description: Allows http connection for URL "prog.keeleressursid.ee" and its subdomains.
+
+    Author: Jürgen Leppsalu
+    Date: 01.05.2021
+-->
+
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">prog.keeleressursid.ee</domain>

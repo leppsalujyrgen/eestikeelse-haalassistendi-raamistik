@@ -1,5 +1,22 @@
 package ee.ut.phon.android.vova;
 
+/**
+ *
+ * File: MainActivity.java
+ *
+ * Description: Estonian voice assistant framework application.
+ * This program takes user speech as input and determines the action that the user requested.
+ * Based on the action detected visual and audible feedback is given.
+ *
+ * Application incorporates K6nele-service. Everything should be in accordance with Apache 2.0
+ * licence. The proper modifications to the original repository are properly noted in README:md file.
+ * For more information see file ,,LICENCE".
+ *
+ * Author: Jürgen Leppsalu
+ * Date: 04.05.2021
+ *
+ */
+
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -34,29 +51,28 @@ import ee.ioc.phon.android.k6neleservice.R;
 import ee.ioc.phon.android.k6neleservice.service.WebSocketRecognitionService;
 
 public class MainActivity extends AppCompatActivity {
-
+    // GUI components
     TextView instructionalTextView;
     ImageButton recordImageButton;
-
+    // Components for transcribing media and giving audible feedback to users.
     SpeechRecognizer sr;
     MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Application setup.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         askForNecessaryPermissions();
-
         // Initialise GUI components.
         instructionalTextView = findViewById(R.id.instructionalTextView);
         recordImageButton = findViewById(R.id.imageButton);
 
         // Configure media player for our application
         mediaPlayer = new MediaPlayer();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             mediaPlayer.setAudioAttributes(
                     new AudioAttributes.Builder()
                             .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
@@ -65,13 +81,14 @@ public class MainActivity extends AppCompatActivity {
             );
         }
 
-        // Configure speech recognizer for the Estonian language.
+        // Configure speech recognizer for Estonian language.
         sr = SpeechRecognizer.createSpeechRecognizer(getApplicationContext());
         sr.setRecognitionListener(new SpeechInputRecognitionListener());
         Intent speechRecognition = new Intent(getApplicationContext(), WebSocketRecognitionService.class);
         speechRecognition.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         speechRecognition.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "et-EE");
 
+        // Start recording and transcribing speech when button is pressed.
         recordImageButton.setOnClickListener(view -> {
             if (mediaPlayer!=null) {
                 mediaPlayer.stop();
@@ -80,37 +97,14 @@ public class MainActivity extends AppCompatActivity {
             if (sr!= null) {
                 sr.cancel();
             }
-            // Start speech recognition.
-            sr.startListening(speechRecognition);
-            // Change GUI text
+            sr.startListening(speechRecognition);                       // Start speech recognition.
             instructionalTextView.setText("Kuulan...");
-            // Disable button and haptic feedback until users command is processed.
-            recordImageButton.setHapticFeedbackEnabled(false);
+            recordImageButton.setHapticFeedbackEnabled(false);          // Disable button and haptic feedback until users command is processed.
             recordImageButton.setEnabled(false);
         });
 
         instructionalTextView.setText("Kuidas saan Teid aidata?");
-
         setGUIInitialState();
-    }
-
-    private void askForNecessaryPermissions() {
-        String[] PERMISSIONS = {
-                Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.INTERNET
-        };
-
-        boolean necessaryPermissionsMissing = false;
-        for (String PERMISSION : PERMISSIONS) {
-            if (ActivityCompat.checkSelfPermission(getApplicationContext(), PERMISSION) == PackageManager.PERMISSION_GRANTED) {
-                necessaryPermissionsMissing=true;
-                break;
-            }
-        }
-
-        if (necessaryPermissionsMissing) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS, PackageManager.PERMISSION_GRANTED);
-        }
     }
 
     @Override
@@ -139,11 +133,12 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
     }
 
+    // Initialise logic elements
     private void init() {
         if (mediaPlayer==null) {
             // Configure media player for our application
             mediaPlayer = new MediaPlayer();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 mediaPlayer.setAudioAttributes(
                         new AudioAttributes.Builder()
                                 .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
@@ -163,6 +158,11 @@ public class MainActivity extends AppCompatActivity {
         setGUIInitialState();
     }
 
+    private void setGUIInitialState() {
+        recordImageButton.setHapticFeedbackEnabled(true);
+        recordImageButton.setEnabled(true);
+    }
+
     private void cleanup() {
         if (mediaPlayer!=null) {
             mediaPlayer.reset();
@@ -175,19 +175,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void setGUIInitialState() {
-        recordImageButton.setHapticFeedbackEnabled(true);
-        recordImageButton.setEnabled(true);
+    // Method requests permission to use microphone and internet.
+    private void askForNecessaryPermissions() {
+        String[] PERMISSIONS = {
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.INTERNET
+        };
+        boolean necessaryPermissionsMissing = false;
+        for (String PERMISSION : PERMISSIONS) {
+            if (ActivityCompat.checkSelfPermission(getApplicationContext(), PERMISSION) == PackageManager.PERMISSION_GRANTED) {
+                necessaryPermissionsMissing=true;
+                break;
+            }
+        }
+        if (necessaryPermissionsMissing) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PackageManager.PERMISSION_GRANTED);
+        }
     }
 
+    // Method determines user requested action based on the transcription of the speech.
+    // Code for making JSON requests derived from: https://www.baeldung.com/httpurlconnection-post
     protected void determineAction(String speechAsText) {
-        // https://www.baeldung.com/httpurlconnection-post
         try {
             JSONObject json = new JSONObject();
             json.put("speech", speechAsText);
 
-            URL url = new URL(getString(R.string.speech_analyzer_api_url));
-            //url = new URL(url.getProtocol(), url.getHost(), 8000, url.getFile());
+            URL url = new URL(getString(R.string.speech_analyzer_api_url));     // Send the speech transcription to the server, that analyses text.
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -199,16 +212,15 @@ public class MainActivity extends AppCompatActivity {
             os.write(json.toString().getBytes("UTF-8"));
             os.close();
 
-            try(BufferedReader br = new BufferedReader(
+            try(BufferedReader br = new BufferedReader(                                     // Process the server's response.
                     new InputStreamReader(con.getInputStream(), "utf-8"))) {
                 StringBuilder response = new StringBuilder();
-                String responseLine = null;
+                String responseLine;
                 while ((responseLine = br.readLine()) != null) {
                     response.append(responseLine.trim());
                 }
-                JSONObject json2 = new JSONObject(response.toString());
-                System.out.println(json2);
-                executeAction(json2);
+                JSONObject responseJSON = new JSONObject(response.toString());
+                executeAction(responseJSON);
             }
         } catch (IOException | JSONException e) {
             e.printStackTrace();
@@ -216,40 +228,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Method where the voice assistant would execute the requested.
+    // However, since the application framework does not perform actions on the device
+    // then feedback for successfully performing the action is presented to the user.
     protected void executeAction(JSONObject json) {
         try {
-            if (json.get("action")==null) {
-                giveFeedback(Feedback.getUnknownCommandFeedback());
-            } else {
-                switch (json.getString("action")) {
-                    case "start_media":
-                        giveFeedback(Feedback.getStartMediaCommandSuccessfulFeedback());
-                        break;
-                    case "stop_media":
-                        giveFeedback(Feedback.getStopMediaCommandSuccessfulFeedback());
-                        break;
-                    case "search":
-                        giveFeedback(Feedback.getSearchCommandSuccessful(json.getString("query")));
-                        break;
-                    case "reminder":
-                        giveFeedback(Feedback.getReminderCommandSuccessful(json.getString("value")));
-                        break;
-                    case "increase_volume":
-                        giveFeedback(Feedback.getIncreaseVolumneCommandSuccessful(json.getInt("percentage")));
-                        break;
-                    case "decrease_volume":
-                        giveFeedback(Feedback.getDecreaseVolumeCommandSuccessful(json.getInt("percentage")));
-                        break;
-                    default:
-                        giveFeedback(Feedback.getUnknownCommandFeedback());
-                        break;
-                }
+            switch (json.getString("action")) {
+                case "start_media":
+                    giveFeedback(Feedback.getStartMediaCommandSuccessfulFeedback());
+                    break;
+                case "stop_media":
+                    giveFeedback(Feedback.getStopMediaCommandSuccessfulFeedback());
+                    break;
+                case "search":
+                    giveFeedback(Feedback.getSearchCommandSuccessful(json.getString("query")));
+                    break;
+                case "reminder":
+                    giveFeedback(Feedback.getReminderCommandSuccessful(json.getString("value")));
+                    break;
+                case "increase_volume":
+                    giveFeedback(Feedback.getIncreaseVolumneCommandSuccessful(json.getInt("percentage")));
+                    break;
+                case "decrease_volume":
+                    giveFeedback(Feedback.getDecreaseVolumeCommandSuccessful(json.getInt("percentage")));
+                    break;
+                default:
+                    giveFeedback(Feedback.getUnknownCommandFeedback());
+                    break;
             }
         } catch (JSONException e) {
             giveFeedback(Feedback.getSpeechAnalysisServerResponseErrorFeedback());
         }
     }
 
+    // Method that gives visual and (if possible) audible feedback to the user
     protected void giveFeedback(Feedback feedback) {
         if (feedback.canAudibleFeedbackBeGiven) {
             try {
@@ -283,7 +295,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+    // Class containing callback functions for speech recognizer.
+    // When speech is recorded and transcribed the results (and errors) are returned to this functions.
+    // This class is modified version of SpeechInputRecognitionListener from K6nele. Link:
+    // https://github.com/Kaljurand/K6nele/blob/master/app/src/main/java/ee/ioc/phon/android/speak/view/SpeechInputView.java
     protected class SpeechInputRecognitionListener implements RecognitionListener {
 
         // Error codes.
@@ -341,33 +356,22 @@ public class MainActivity extends AppCompatActivity {
         public void onPartialResults(final Bundle bundle) {
             ArrayList<String> results = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             if (results != null && !results.isEmpty()) {
-                System.out.println(results);
-                new Thread(() -> {
-                    determineAction(results.get(0));
-                }).start();
+                new Thread(() -> determineAction(results.get(0))).start();
             } else {
-                new Thread(() -> {
-                    giveFeedback(Feedback.getNoTranscriptionResultsFeedback());
-                }).start();
+                new Thread(() -> giveFeedback(Feedback.getNoTranscriptionResultsFeedback())).start();
             }
         }
 
         @Override
-        public void onEvent(int eventType, Bundle params) {
-            // TODO: future work: not sure how this can be generated by the service
-        }
+        public void onEvent(int eventType, Bundle params) { }
 
         @Override
         public void onResults(final Bundle bundle) {
             ArrayList<String> results = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             if (results != null && !results.isEmpty()) {
-                new Thread(() -> {
-                    determineAction(results.get(0));
-                }).start();
+                new Thread(() -> determineAction(results.get(0))).start();
             } else {
-                new Thread(() -> {
-                    giveFeedback(Feedback.getNoTranscriptionResultsFeedback());
-                }).start();
+                new Thread(() -> giveFeedback(Feedback.getNoTranscriptionResultsFeedback())).start();
             }
         }
 

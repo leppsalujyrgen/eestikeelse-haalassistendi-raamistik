@@ -1,3 +1,13 @@
+
+<!--
+    Filename: ic_microphone_foreground.xml
+
+    Description: Icon for the recorder button.
+
+    Author: Jürgen Leppsalu
+    Date: 04.05.2021
+-->
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"

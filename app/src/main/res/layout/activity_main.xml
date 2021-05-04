@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Filename: activity_main.xml
+
+    Description: GUI for Estonian voice assistant framework.
+
+    Author: Jürgen Leppsalu
+    Date: 04.05.2021
+-->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
